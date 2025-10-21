@@ -6,45 +6,12 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     private static final int DEFAULT_CAPACITY = 16;
     private static final float LOAD_FACTOR = 0.75f;
     private int size = 0;
-    private Node<K, V>[] table = new Node[DEFAULT_CAPACITY];
+    private Node<K, V>[] table;
     private int threshold = (int) (DEFAULT_CAPACITY * LOAD_FACTOR);
 
-    private static int hash(Object key) {
-        int h;
-        return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
-    }
-
-    private void resize() {
-        Node<K, V>[] oldTable = table;
-        int oldCapacity = (oldTable == null) ? 0 : oldTable.length;
-        int newCapacity = (oldCapacity == 0) ? DEFAULT_CAPACITY : oldCapacity * 2;
-        int newThreshold = (int) (newCapacity * LOAD_FACTOR);
-        Node<K, V>[] newTable = new Node[newCapacity];
-        if (oldTable != null) {
-            for (Node<K, V> kvNode : oldTable) {
-                while (kvNode != null) {
-                    Node<K, V> next = kvNode.next;
-                    int newIndex = hash(kvNode.key) & (newCapacity - 1);
-                    kvNode.next = newTable[newIndex];
-                    newTable[newIndex] = kvNode;
-                    kvNode = next;
-                }
-            }
-        }
-        table = newTable;
-        threshold = newThreshold;
-    }
-
-    private class Node<K, V> {
-        private final K key;
-        private V value;
-        private Node<K, V> next;
-
-        public Node(K key, V value, Node<K, V> next) {
-            this.key = key;
-            this.value = value;
-            this.next = next;
-        }
+    @SuppressWarnings("unchecked")
+    public MyHashMap() {
+        table = new Node[DEFAULT_CAPACITY];
     }
 
     @Override
@@ -88,5 +55,44 @@ public class MyHashMap<K, V> implements MyMap<K, V> {
     @Override
     public int getSize() {
         return size;
+    }
+
+    private static int hash(Object key) {
+        int h;
+        return (key == null) ? 0 : (h = key.hashCode()) ^ (h >>> 16);
+    }
+
+    @SuppressWarnings("unchecked")
+    private void resize() {
+        Node<K, V>[] oldTable = table;
+        int oldCapacity = (oldTable == null) ? 0 : oldTable.length;
+        int newCapacity = (oldCapacity == 0) ? DEFAULT_CAPACITY : oldCapacity * 2;
+        int newThreshold = (int) (newCapacity * LOAD_FACTOR);
+        Node<K, V>[] newTable = new Node[newCapacity];
+        if (oldTable != null) {
+            for (Node<K, V> kvNode : oldTable) {
+                while (kvNode != null) {
+                    Node<K, V> next = kvNode.next;
+                    int newIndex = hash(kvNode.key) & (newCapacity - 1);
+                    kvNode.next = newTable[newIndex];
+                    newTable[newIndex] = kvNode;
+                    kvNode = next;
+                }
+            }
+        }
+        table = newTable;
+        threshold = newThreshold;
+    }
+
+    private static class Node<K, V> {
+        private final K key;
+        private V value;
+        private Node<K, V> next;
+
+        private Node(K key, V value, Node<K, V> next) {
+            this.key = key;
+            this.value = value;
+            this.next = next;
+        }
     }
 }
